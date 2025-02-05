@@ -19,6 +19,7 @@ AI & the Web, winter term 2024/2025
     > flask --app channel.py register
     
 5. Now open the client from step 3 (URL is displayed in the terminal)
+    > python client.py // added by jule
 
 
 ## Creating your own client
