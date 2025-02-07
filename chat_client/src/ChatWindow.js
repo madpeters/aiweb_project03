@@ -1,9 +1,8 @@
-// Display messages for a specific channel
-
-// ChatWindow.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MessageInput from './MessageInput';
+
+const API_URL = 'http://localhost:5001';  // Update with your correct API endpoint
 
 const ChatWindow = ({ channel, userName }) => {
   const [messages, setMessages] = useState([]);
@@ -11,7 +10,7 @@ const ChatWindow = ({ channel, userName }) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`/api/messages?channel=${channel.id}`);
+        const response = await axios.get(`${API_URL}/messages?channel=${channel.id}`);
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -22,15 +21,28 @@ const ChatWindow = ({ channel, userName }) => {
   }, [channel]);
 
   const formatMessage = (message) => {
-    // Replace [nop]*word*[/nop] with <i>word</i>
+    // Replace [nop]*word*[/nop] with <i>word</i> and other formatting
     return message.replace(/\*([^*]+)\*/g, '<i>$1</i>')
                   .replace(/\[nop\](.*?)\[\/nop\]/g, '<b>$1</b>');
   };
 
   const handleSendMessage = (message) => {
     // Send the message to the backend
-    axios.post('/api/messages', { channelId: channel.id, userName, message });
-    setMessages([...messages, { userName, message }]);
+    const messagePayload = {
+      channelId: channel.id,
+      userName: userName,
+      message: message,
+      timestamp: new Date().toISOString(),
+    };
+
+    axios.post(`${API_URL}/messages`, messagePayload)
+      .then(() => {
+        // Update the local state after sending the message
+        setMessages([...messages, { userName, message, timestamp: new Date().toISOString() }]);
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error);
+      });
   };
 
   return (
@@ -52,3 +64,4 @@ const ChatWindow = ({ channel, userName }) => {
 };
 
 export default ChatWindow;
+

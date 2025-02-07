@@ -3,7 +3,7 @@
 // ChannelList.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+/*
 const ChannelList = ({ setChannel }) => {
   const [channels, setChannels] = useState([]);
   const [unreadMessages, setUnreadMessages] = useState({});
@@ -50,3 +50,25 @@ const ChannelList = ({ setChannel }) => {
 };
 
 export default ChannelList;
+*/
+
+const ChannelList = ({ channels, setChannel }) => {
+    return (
+      <div className="channel-list">
+        <h2>Channels</h2>
+        {channels.length > 0 ? (
+          <ul>
+            {channels.map((channel, index) => (
+              <li key={index} onClick={() => setChannel(channel)}>
+                {channel.name}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No channels available.</p>
+        )}
+      </div>
+    );
+  };
+  
+  export default ChannelList;

@@ -5,6 +5,10 @@ from flask import Flask, request, render_template, jsonify
 import json
 import requests
 from datetime import datetime, timedelta
+from flask_cors import CORS
+
+
+
 
 # Class-based application configuration
 class ConfigClass(object):
@@ -17,6 +21,9 @@ class ConfigClass(object):
 app = Flask(__name__)
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
+# Initialize CORS to allow requests from React app (frontend)
+CORS(app)
+
 
 HUB_URL = 'http://localhost:5555'
 HUB_AUTHKEY = '1234567890'
