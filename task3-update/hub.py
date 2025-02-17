@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 import datetime
 import requests
-from flask_cors import CORS
 
 db = SQLAlchemy()
 
@@ -36,7 +35,6 @@ app.app_context().push()  # create an app context before initializing db
 db.init_app(app)  # initialize database
 db.create_all()  # create database if necessary
 
-CORS(app, origins="http://localhost:3000")
 SERVER_AUTHKEY = '1234567890'
 STANDARD_CLIENT_URL = 'http://localhost:5005' # standard configuration in client.py, chang to real URL if necessary
 

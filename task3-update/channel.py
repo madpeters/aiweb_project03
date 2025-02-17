@@ -4,27 +4,18 @@
 from flask import Flask, request, render_template, jsonify
 import json
 import requests
-from datetime import datetime, timedelta
-from flask_cors import CORS
-
-
-
 
 # Class-based application configuration
 class ConfigClass(object):
     """ Flask application config """
 
     # Flask settings
-    SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!'
+    SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!' # change to something random, no matter what
 
 # Create Flask app
 app = Flask(__name__)
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
-# Initialize CORS to allow requests from React app (frontend)
-CORS(app)
-CORS(app, origins="http://localhost:3000")
-
 
 HUB_URL = 'http://localhost:5555'
 HUB_AUTHKEY = '1234567890'
@@ -33,10 +24,6 @@ CHANNEL_NAME = "The One and Only Channel"
 CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:chat'
-
-
-MAX_MESSAGES = 100  # Limit the number of messages stored
-UNWANTED_WORDS = ['badword1', 'badword2']  # List of offensive 
 
 @app.cli.command('register')
 def register_command():
@@ -92,30 +79,23 @@ def send_message():
     message = request.json
     if not message:
         return "No message", 400
-    content = message.get('content', '')
     if not 'content' in message:
         return "No content", 400
     if not 'sender' in message:
         return "No sender", 400
     if not 'timestamp' in message:
         return "No timestamp", 400
-    # Check for unwanted words
-    if not filter_message(content):
-        return "Message contains inappropriate content", 400
     if not 'extra' in message:
         extra = None
     else:
         extra = message['extra']
-    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # add message to messages
     messages = read_messages()
     messages.append({'content': message['content'],
                      'sender': message['sender'],
-                     'timestamp': timestamp,
+                     'timestamp': message['timestamp'],
                      'extra': extra,
-                        'pinned': False,
                      })
-    delete_old_messages()
     save_messages(messages)
     return "OK", 200
 
@@ -136,54 +116,6 @@ def save_messages(messages):
     global CHANNEL_FILE
     with open(CHANNEL_FILE, 'w') as f:
         json.dump(messages, f)
-
-# Pin a message
-@app.route('/pin', methods=['POST'])
-def pin_message():
-    message_data = request.json
-    timestamp = message_data.get('timestamp', '')
-    
-    if not timestamp:
-        return "No timestamp provided", 400
-
-    messages = read_messages()
-    
-    for message in messages:
-        if message['timestamp'] == timestamp:
-            message['pinned'] = True
-            save_messages(messages)
-            return jsonify({"message": "Message pinned successfully!"}), 200
-    
-    return "Message not found", 404
-
-# Delete messages older than 1 day (except pinned ones)
-def delete_old_messages():
-    one_day_ago = datetime.now() - timedelta(days=1)
-    messages = read_messages()
-    
-    # Keep only messages that are either pinned or within the last day
-    filtered_messages = [
-        msg for msg in messages
-        if msg.get('pinned', False) or datetime.strptime(msg['timestamp'], "%Y-%m-%d %H:%M:%S") > one_day_ago
-    ]
-    
-    save_messages(filtered_messages)
-
-def filter_message(content):
-    for word in UNWANTED_WORDS:
-        if word in content.lower():
-            return False  # Reject message if it contains an unwanted word
-    return True
-
-@app.route('/search', methods=['GET'])
-def search_messages():
-    query = request.args.get('query', '').lower()
-    if not query:
-        return "No query provided", 400
-    
-    messages = read_messages()
-    matching_messages = [msg for msg in messages if query in msg['content'].lower()]
-    return jsonify(matching_messages)
 
 # Start development web server
 # run flask --app channel.py register

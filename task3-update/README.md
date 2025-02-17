@@ -18,17 +18,23 @@ AI & the Web, winter term 2024/2025
 
     > flask --app channel.py register
     
-5. Now open the client from step 3 (URL is displayed in the terminal)
-    > python client.py // added by jule
+5. Start the flask client (new shell or shell from 4.) 
 
-6. To start the react client
-    > npm start 
+    > python client.py
+
+6. Open the client, link is displayed after client start (e.g., http://localhost:5005)
+
+7. Start the React client
+
+There is no complete react client (yet), but you can use the react-client.html file as a starting point. Simply open it in your browser locally.
 
 
-## Creating your own client
+## Creating your own flask channel
 
-1. Set variables in the client code
+1. Set variables in the channel code
 2. Modify the code
+
+
 
 # Deploying on the server
 
