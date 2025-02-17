@@ -31,6 +31,8 @@ import ChannelList from './ChannelList';
 import ChatWindow from './ChatWindow';
 import UserNamePrompt from './UserNamePrompt';
 
+
+
 const API_URL = 'http://localhost:5555'; // Hub app URL
 const CHANNEL_URL = 'http://localhost:5001';
 
@@ -41,12 +43,21 @@ const App = () => {
   
   // Fetch channels from the hub app when the app loads
   useEffect(() => {
-    axios.get(`${API_URL}/channels`)
-      .then(response => {
-        setChannels(response.data.channels); // Set channels state
-      })
-      .catch(error => console.error('Error fetching channels:', error));
+    const authKey = '1234567890'; // Replace with your actual auth key or token
+    
+    axios.get(`${API_URL}/channels`, {
+      headers: {
+        'Authorization': `Bearer ${authKey}`  // If it's a Bearer token, or adjust as needed
+      }
+    })
+    .then(response => {
+      setChannels(response.data.channels); // Set channels state
+    })
+    .catch(error => {
+      console.error('Error fetching channels:', error);
+    });
   }, []);
+  
 
   if (!userName) {
     return <UserNamePrompt setUserName={setUserName} />;
