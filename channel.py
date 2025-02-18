@@ -6,8 +6,10 @@ import json
 import requests
 from datetime import datetime, timedelta
 from flask_cors import CORS
+from better_profanity import profanity #mp added unwanted words
 
-
+# mp Initialize the profanity filter
+profanity.load_censor_words()
 
 
 # Class-based application configuration
@@ -29,14 +31,14 @@ CORS(app, origins="http://localhost:3000")
 HUB_URL = 'http://localhost:5555'
 HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
-CHANNEL_NAME = "The One and Only Channel"
+CHANNEL_NAME = "Talking Houseplants" # mp name of the channel changed
 CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:chat'
 
 
 MAX_MESSAGES = 100  # Limit the number of messages stored
-UNWANTED_WORDS = ['badword1', 'badword2']  # List of offensive 
+#UNWANTED_WORDS = ['badword1', 'badword2']  # List of offensive mp: not used anymore since we use profanity package
 
 @app.cli.command('register')
 def register_command():
@@ -78,6 +80,19 @@ def health_check():
 def home_page():
     if not check_authorization(request):
         return "Invalid authorization", 400
+    # mp welcome message added if the user enters the channel the first time
+    # messages = read_messages()
+    # if not messages:
+    #     welcome_message = {
+    #         'content': 'Welcome to Houseplant Chat—your cozy corner for all things green! Whether you are a seasoned plant parent or just starting your journey, dive in to share tips, swap stories, and celebrate every little leaf. Let’s grow together!',
+    #         'sender': 'System',
+    #         'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+    #         'extra': None,
+    #         'pinned': False
+    #     }
+    #     messages.append(welcome_message)
+    #     save_messages(messages)
+    # return jsonify(messages)
     # fetch channels from server
     return jsonify(read_messages())
 
@@ -106,7 +121,7 @@ def send_message():
         extra = None
     else:
         extra = message['extra']
-    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))
     # add message to messages
     messages = read_messages()
     messages.append({'content': message['content'],
@@ -164,16 +179,18 @@ def delete_old_messages():
     # Keep only messages that are either pinned or within the last day
     filtered_messages = [
         msg for msg in messages
-        if msg.get('pinned', False) or datetime.strptime(msg['timestamp'], "%Y-%m-%d %H:%M:%S") > one_day_ago
+        # mp fixed timestamp format to match the strptime format
+        if msg.get('pinned', False) or datetime.strptime(msg['timestamp'], "%Y-%m-%dT%H:%M:%S.%f") > one_day_ago
     ]
     
     save_messages(filtered_messages)
 
 def filter_message(content):
-    for word in UNWANTED_WORDS:
-        if word in content.lower():
-            return False  # Reject message if it contains an unwanted word
-    return True
+    return not profanity.contains_profanity(content)
+    # for word in UNWANTED_WORDS:
+    #     if word in content.lower():
+    #         return False  # Reject message if it contains an unwanted word
+    # return True
 
 @app.route('/search', methods=['GET'])
 def search_messages():
@@ -189,5 +206,24 @@ def search_messages():
 # run flask --app channel.py register
 # to register channel with hub
 
+# mp added welcome message on top of the messages
+def send_welcome_message():
+    welcome_message = {
+        'content': 'Welcome to Houseplant Chat—your cozy corner for all things green! Whether you are a seasoned plant parent or just starting your journey, dive in to share tips, swap stories, and celebrate every little leaf. Let’s grow together!',
+        'sender': 'Houseplant Bot',
+        'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+        'extra': None,
+        'pinned': False
+    }
+    messages = read_messages()
+
+    # Check if the welcome message already exists
+    if not messages or messages[0]['content'] != welcome_message['content']:
+        messages.insert(0, welcome_message)  # Insert the welcome message at the beginning
+        save_messages(messages)
+
+
+
 if __name__ == '__main__':
+    send_welcome_message()
     app.run(port=5001, debug=True)
