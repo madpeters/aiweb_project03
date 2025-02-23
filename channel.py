@@ -34,7 +34,7 @@ CHANNEL_AUTHKEY = '0987654321'
 CHANNEL_NAME = "Talking Houseplants" # mp name of the channel changed
 CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
 CHANNEL_FILE = 'messages.json'
-CHANNEL_TYPE_OF_SERVICE = 'aiweb24:chat'
+CHANNEL_TYPE_OF_SERVICE = 'aiweb24:houseplant_chat'
 
 
 MAX_MESSAGES = 100  # Limit the number of messages stored
@@ -97,6 +97,44 @@ def home_page():
     return jsonify(read_messages())
 
 # POST: Send a message
+#@app.route('/', methods=['POST'])
+#def send_message():
+    # fetch channels from server
+    # check authorization header
+#    if not check_authorization(request):
+#        return "Invalid authorization", 400
+    # check if message is present
+#    message = request.json
+#    if not message:
+#        return "No message", 400
+#    content = message.get('content', '')
+#    if not 'content' in message:
+#        return "No content", 400
+#    if not 'sender' in message:
+#        return "No sender", 400
+#    if not 'timestamp' in message:
+#        return "No timestamp", 400
+    # Check for unwanted words
+#    if not filter_message(content):
+#        return "Message contains inappropriate content", 400
+#    if not 'extra' in message:
+#        extra = None
+#    else:
+#        extra = message['extra']
+#    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))
+    # add message to messages
+#    messages = read_messages()
+#    messages.append({'content': message['content'],
+#                     'sender': message['sender'],
+#                     'timestamp': timestamp,
+#                     'extra': extra,
+#                        'pinned': False,
+#                     })
+#    delete_old_messages()
+#    save_messages(messages)
+#    return "OK", 200
+
+# POST: Send a message
 @app.route('/', methods=['POST'])
 def send_message():
     # fetch channels from server
@@ -107,7 +145,7 @@ def send_message():
     message = request.json
     if not message:
         return "No message", 400
-    content = message.get('content', '')
+    content = message.get('content', '') # Get content safely using .get() with default
     if not 'content' in message:
         return "No content", 400
     if not 'sender' in message:
@@ -115,22 +153,26 @@ def send_message():
     if not 'timestamp' in message:
         return "No timestamp", 400
     # Check for unwanted words
-    if not filter_message(content):
+    if not filter_message(content): # Use filter_message function to check for profanity
         return "Message contains inappropriate content", 400
+
+    response_message = generate_houseplant_response(content) # Active response for houseplants # Modified - Call to active response function
+
     if not 'extra' in message:
         extra = None
     else:
         extra = message['extra']
-    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))
+    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")) # Get timestamp safely with default
+
     # add message to messages
     messages = read_messages()
     messages.append({'content': message['content'],
                      'sender': message['sender'],
                      'timestamp': timestamp,
                      'extra': extra,
-                        'pinned': False,
+                     'response': response_message # Include houseplant-related response # Modified - Include response message
                      })
-    delete_old_messages()
+    delete_old_messages() # Call delete_old_messages to enforce message limit
     save_messages(messages)
     return "OK", 200
 
@@ -206,14 +248,26 @@ def search_messages():
 # run flask --app channel.py register
 # to register channel with hub
 
+WELCOME_MESSAGE_CONTENT = f"Welcome to Houseplant Chat — your cozy corner for all things green! Whether you are a seasoned plant parent or just starting your journey, dive in to share tips, swap stories, and celebrate every little leaf. Let’s grow together!"
+HOUSEPLANT_TIPS = [  # houseplant tips for active responses
+    "Water your houseplants based on their specific needs. Overwatering is a common problem!",
+    "Most houseplants prefer bright, indirect sunlight. Avoid direct afternoon sun which can scorch leaves.",
+    "Use well-draining potting mix to ensure healthy roots.",
+    "Fertilize your houseplants during the growing season (spring and summer) to encourage growth.",
+    "Regularly check your plants for pests and diseases.",
+    "Different houseplants have different humidity needs. Grouping plants together can help increase humidity.",
+    "Pruning can encourage bushier growth and remove dead or yellowing leaves."
+]
+
 # mp added welcome message on top of the messages
 def send_welcome_message():
     welcome_message = {
-        'content': 'Welcome to Houseplant Chat—your cozy corner for all things green! Whether you are a seasoned plant parent or just starting your journey, dive in to share tips, swap stories, and celebrate every little leaf. Let’s grow together!',
+        'content': WELCOME_MESSAGE_CONTENT,
         'sender': 'Houseplant Bot',
         'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
         'extra': None,
-        'pinned': False
+        'pinned': False,
+        'response' : None # Welcome message has no response
     }
     messages = read_messages()
 
@@ -222,7 +276,23 @@ def send_welcome_message():
         messages.insert(0, welcome_message)  # Insert the welcome message at the beginning
         save_messages(messages)
 
+def generate_houseplant_response(user_message): # Active response function for houseplants # Added - Active response function
+    """Generates a simple houseplant tip or response based on user message content.""" # Added - Docstring
+    user_message_lower = user_message.lower()
 
+    if "water" in user_message_lower:
+        return "💧 Remember to check the soil moisture before watering your houseplants. Most prefer the top inch of soil to dry out between waterings."
+    elif "sunlight" in user_message_lower or "light" in user_message_lower:
+        return "☀️  Houseplants thrive in bright, indirect sunlight. Consider the light requirements of your specific plant."
+    elif "fertilize" in user_message_lower or "fertiliser" in user_message_lower or "feed":
+        return "🌱 During the growing season (spring/summer), fertilizing every 2-4 weeks can boost your houseplant's health."
+    elif "pest" in user_message_lower or "bugs" in user_message_lower or "disease" in user_message_lower:
+        return "🔎 Regularly inspect your houseplants for pests and diseases. Early detection is key to treatment!"
+    elif "tip" in user_message_lower or "advice" in user_message_lower or "help":
+        import random
+        return f"💡 Houseplant Tip: {random.choice(HOUSEPLANT_TIPS)}" # Random tip from list
+    else:
+        return "🌿  That's interesting!  Tell me more about your houseplants." # General response
 
 if __name__ == '__main__':
     send_welcome_message()
