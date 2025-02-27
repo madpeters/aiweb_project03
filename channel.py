@@ -6,7 +6,7 @@ import json
 import requests
 from datetime import datetime, timedelta
 from flask_cors import CORS
-from better_profanity import profanity #mp added unwanted words
+from better_profanity import profanity  #mp added unwanted words
 
 # mp Initialize the profanity filter
 profanity.load_censor_words()
@@ -59,13 +59,18 @@ def register_command():
         return
 
 def check_authorization(request):
+
+
     global CHANNEL_AUTHKEY
+    
+    # print("Request Headers:", request.headers)
     # check if Authorization header is present
     if 'Authorization' not in request.headers:
         return False
     # check if authorization header is valid
     if request.headers['Authorization'] != 'authkey ' + CHANNEL_AUTHKEY:
         return False
+        
     return True
 
 @app.route('/health', methods=['GET'])
