@@ -59,32 +59,48 @@ def register_command():
         return
 
 def check_authorization(request):
-
-
     global CHANNEL_AUTHKEY
     
-    # print("Request Headers:", request.headers)
-    # check if Authorization header is present
+    # Print request headers (for debugging purposes)
+    print("Request Headers:", request.headers)
+
+    # Check if Authorization header is present
     if 'Authorization' not in request.headers:
+        print("Authorization header missing.")
         return False
-    # check if authorization header is valid
-    if request.headers['Authorization'] != 'authkey ' + CHANNEL_AUTHKEY:
+    
+    # Check if authorization header is in the correct format
+    expected_auth = 'authkey ' + CHANNEL_AUTHKEY
+    received_auth = request.headers['Authorization']
+    
+    # Log received and expected auth values for debugging
+    print(f"Expected Authorization: {expected_auth}")
+    print(f"Received Authorization: {received_auth}")
+    
+    # Check if the authorization header is valid
+    if received_auth != expected_auth:
+        print("Invalid Authorization key.")
         return False
         
     return True
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
     global CHANNEL_NAME
     if not check_authorization(request):
-        return "Invalid authorization", 400
+        return "Invalid authorization 1", 400
     return jsonify({'name':CHANNEL_NAME}),  200
+
+
+
+
 
 # GET: Return list of messages
 @app.route('/', methods=['GET'])
 def home_page():
     if not check_authorization(request):
-        return "Invalid authorization", 400
+        return "Invalid authorization2 ", 400
     # mp welcome message added if the user enters the channel the first time
     # messages = read_messages()
     # if not messages:
@@ -100,6 +116,18 @@ def home_page():
     # return jsonify(messages)
     # fetch channels from server
     return jsonify(read_messages())
+
+@app.route('/messages', methods=['GET'])
+def get_messages():
+    channel_name = request.args.get('channel')  # Use channelName instead of channelId
+    if not channel_name:
+        return jsonify({"error": "Channel name is required"}), 400
+    
+    # Fetch messages for the specified channel
+    messages = read_messages_for_channel(channel_name)
+    return jsonify(messages)
+
+
 
 # POST: Send a message
 #@app.route('/', methods=['POST'])
@@ -140,59 +168,80 @@ def home_page():
 #    return "OK", 200
 
 # POST: Send a message
-@app.route('/', methods=['POST'])
+@app.route('/messages', methods=['POST'])
 def send_message():
-    # fetch channels from server
-    # check authorization header
+    print("Received data:", request.json)
+    
     if not check_authorization(request):
         return "Invalid authorization", 400
-    # check if message is present
+    
+    # Check if message is present
     message = request.json
     if not message:
         return "No message", 400
-    content = message.get('content', '') # Get content safely using .get() with default
-    if not 'content' in message:
+
+    content = message.get('content')
+    sender = message.get('sender')
+    timestamp = message.get('timestamp')
+    channel_name = message.get('channelName')  # Use channelName instead of channelId
+
+    if not content:
         return "No content", 400
-    if not 'sender' in message:
+    if not sender:
         return "No sender", 400
-    if not 'timestamp' in message:
-        return "No timestamp", 400
+    if not timestamp:
+        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f") 
+    if not channel_name:  # Make sure channelName is provided
+        return "No channelName", 400
+    
     # Check for unwanted words
-    if not filter_message(content): # Use filter_message function to check for profanity
+    if not filter_message(content):  # Use filter_message function to check for profanity
         return "Message contains inappropriate content", 400
+    
+    print(f"Received message for channel {channel_name}: {content}")
 
-    response_message = generate_houseplant_response(content) # Active response for houseplants # Modified - Call to active response function
+    response_message = generate_houseplant_response(content)  # Active response for houseplants
 
-    if not 'extra' in message:
-        extra = None
-    else:
-        extra = message['extra']
-    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")) # Get timestamp safely with default
+    extra = message.get('extra', None)
 
-    # add message to messages
+    # Add message to messages list
     messages = read_messages()
-    messages.append({'content': message['content'],
-                     'sender': message['sender'],
-                     'timestamp': timestamp,
-                     'extra': extra,
-                     'response': response_message # Include houseplant-related response # Modified - Include response message
-                     })
-    delete_old_messages() # Call delete_old_messages to enforce message limit
+    messages.append({
+        'content': content,
+        'sender': sender,
+        'timestamp': timestamp,
+        'extra': extra,
+        'channel_name': channel_name,  # Use channel_name instead of channelId
+        'response': response_message,
+        'pinned': False,
+    })
+    
+    # Delete old messages if necessary
+    delete_old_messages()
     save_messages(messages)
+    
     return "OK", 200
+
+
 
 def read_messages():
     global CHANNEL_FILE
     try:
-        f = open(CHANNEL_FILE, 'r')
+        with open(CHANNEL_FILE, 'r') as f:
+            messages = json.load(f)
     except FileNotFoundError:
         return []
-    try:
-        messages = json.load(f)
     except json.decoder.JSONDecodeError:
         messages = []
     f.close()
     return messages
+
+# Function to read messages for a specific channel
+def read_messages_for_channel(channel_name):
+    messages = read_messages()  # Fetch all messages
+    #channel_messages = [msg for msg in messages if msg['channel_name'] == channel_name]
+    return messages
+
 
 def save_messages(messages):
     global CHANNEL_FILE
@@ -219,16 +268,30 @@ def pin_message():
     return "Message not found", 404
 
 # Delete messages older than 1 day (except pinned ones)
+from datetime import datetime, timedelta
+
 def delete_old_messages():
     one_day_ago = datetime.now() - timedelta(days=1)
     messages = read_messages()
     
-    # Keep only messages that are either pinned or within the last day
-    filtered_messages = [
-        msg for msg in messages
-        # mp fixed timestamp format to match the strptime format
-        if msg.get('pinned', False) or datetime.strptime(msg['timestamp'], "%Y-%m-%dT%H:%M:%S.%f") > one_day_ago
-    ]
+    filtered_messages = []
+    for msg in messages:
+        try:
+            # Handle missing timestamp and incorrect format gracefully
+            timestamp = msg.get('timestamp')
+            if timestamp:
+                # Ensure the timestamp is in the correct format before comparing
+                msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+                if msg.get('pinned', False) or msg_time > one_day_ago:
+                    filtered_messages.append(msg)
+            else:
+                # If no timestamp, keep it or handle differently
+                print(f"Skipping message with missing timestamp: {msg}")
+                filtered_messages.append(msg)
+        except ValueError:
+            # Handle incorrect timestamp format gracefully
+            print(f"Skipping message with invalid timestamp: {msg.get('timestamp')}")
+            filtered_messages.append(msg)  # Optionally log or handle differently
     
     save_messages(filtered_messages)
 

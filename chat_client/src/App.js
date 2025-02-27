@@ -24,22 +24,18 @@ const App = () => {
 
 export default App;
 */
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChannelList from './ChannelList';
 import ChatWindow from './ChatWindow';
 import UserNamePrompt from './UserNamePrompt';
 
-
-
 const API_URL = 'http://localhost:5555'; // Hub app URL
-const CHANNEL_URL = 'http://localhost:5001';
 
 const App = () => {
   const [userName, setUserName] = useState('');
   const [channels, setChannels] = useState([]);  // State to store channels
-  const [channel, setChannel] = useState(null);
+  const [channel, setChannel] = useState(null);  // State to store selected channel
   
   // Fetch channels from the hub app when the app loads
   useEffect(() => {
@@ -47,17 +43,17 @@ const App = () => {
     
     axios.get(`${API_URL}/channels`, {
       headers: {
-        'Authorization': `Bearer ${authKey}`  // If it's a Bearer token, or adjust as needed
+        'Authorization': `Bearer ${authKey}`  // Adjust as needed
       }
     })
     .then(response => {
+      console.log('Fetched channels:', response.data.channels); 
       setChannels(response.data.channels); // Set channels state
     })
     .catch(error => {
       console.error('Error fetching channels:', error);
     });
   }, []);
-  
 
   if (!userName) {
     return <UserNamePrompt setUserName={setUserName} />;

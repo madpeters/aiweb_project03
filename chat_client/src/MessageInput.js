@@ -1,14 +1,12 @@
-// Allos user to type and send messages
-
-// MessageInput.js
 import React, { useState } from 'react';
 
-const MessageInput = ({ onSendMessage }) => {
+const MessageInput = ({ onSendMessage, channelName }) => {
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
     if (message.trim()) {
-      onSendMessage(message);
+      // Pass the channelName along with the message content to onSendMessage
+      onSendMessage(message, channelName); // Changed from channelId to channelName
       setMessage('');
     }
   };
@@ -27,3 +25,5 @@ const MessageInput = ({ onSendMessage }) => {
 };
 
 export default MessageInput;
+
+

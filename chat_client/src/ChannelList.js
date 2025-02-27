@@ -52,23 +52,26 @@ const ChannelList = ({ setChannel }) => {
 export default ChannelList;
 */
 
+
 const ChannelList = ({ channels, setChannel }) => {
-    return (
-      <div className="channel-list">
-        <h2>Channels</h2>
-        {channels.length > 0 ? (
-          <ul>
-            {channels.map((channel, index) => (
-              <li key={index} onClick={() => setChannel(channel)}>
-                {channel.name}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No channels available.</p>
-        )}
-      </div>
-    );
-  };
-  
-  export default ChannelList;
+  return (
+    <div className="channel-list">
+      <h2>Channels</h2>
+      {channels.length > 0 ? (
+        <ul>
+          {channels.map((channel) => (
+            <li key={channel.id} onClick={() => {console.log('Channel selected:', channel); setChannel(channel)}}>
+              
+              {channel.name}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No channels available.</p>
+      )}
+    </div>
+  );
+};
+
+export default ChannelList;
+
