@@ -104,20 +104,6 @@ def health_check():
 def home_page():
     if not check_authorization(request):
         return "Invalid authorization2 ", 400
-    # mp welcome message added if the user enters the channel the first time
-    # messages = read_messages()
-    # if not messages:
-    #     welcome_message = {
-    #         'content': 'Welcome to Houseplant Chat—your cozy corner for all things green! Whether you are a seasoned plant parent or just starting your journey, dive in to share tips, swap stories, and celebrate every little leaf. Let’s grow together!',
-    #         'sender': 'System',
-    #         'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
-    #         'extra': None,
-    #         'pinned': False
-    #     }
-    #     messages.append(welcome_message)
-    #     save_messages(messages)
-    # return jsonify(messages)
-    # fetch channels from server
     return jsonify(read_messages())
 
 @app.route('/messages', methods=['GET'])
@@ -364,6 +350,10 @@ def generate_houseplant_response(user_message): # Active response function for h
         return f"💡 Houseplant Tip: {random.choice(HOUSEPLANT_TIPS)}" # Random tip from list
     else:
         return "🌿  That's interesting!  Tell me more about your houseplants." # General response
+    
+@app.route('/react_client')
+def react_client():
+    return render_template('react_client.html')
 
 if __name__ == '__main__':
     send_welcome_message()
