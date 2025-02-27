@@ -1,3 +1,3 @@
-from channel import app
+from channel.py import app
 application = app
 

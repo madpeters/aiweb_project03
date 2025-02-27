@@ -28,14 +28,14 @@ CORS(app)
 CORS(app, origins="http://localhost:3000")
 
 
-# HUB_URL = 'http://localhost:5555'
-HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-HUB_AUTHKEY = 'Crr-K24d-2N'
-# HUB_AUTHKEY = '1234567890'
+HUB_URL = 'http://localhost:5555'
+#HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
+#HUB_AUTHKEY = 'Crr-K24d-2N'
+HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
 CHANNEL_NAME = "Talking Houseplants" # mp name of the channel changed
-#CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
-CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi"
+CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
+#CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi"
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:houseplant_chat'
 

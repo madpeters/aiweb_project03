@@ -23,6 +23,7 @@ AI & the Web, winter term 2024/2025
 
 6. To start the react client
     > npm start 
+    > NODE_OPTIONS=--openssl-legacy-provider npm start // if npm start doesnt work
 
 
 ## Creating your own client
