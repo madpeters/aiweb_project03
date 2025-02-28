@@ -28,14 +28,14 @@ CORS(app)
 CORS(app, origins="http://localhost:3000")
 
 
-#HUB_URL = 'http://localhost:5555'
-HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-HUB_AUTHKEY = 'Crr-K24d-2N'
-#HUB_AUTHKEY = '1234567890'
+HUB_URL = 'http://localhost:5555'
+#HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
+#HUB_AUTHKEY = 'Crr-K24d-2N'
+HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
-CHANNEL_NAME = "Talking Houseplants" # mp name of the channel changed
-#CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
-CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi/"
+CHANNEL_NAME = "Talking Houseplants 🌱" # mp name of the channel changed
+CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
+#CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi/"
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:houseplant_chat'
 
@@ -109,6 +109,7 @@ def home_page():
 @app.route('/messages', methods=['GET'])
 def get_messages():
     channel_name = request.args.get('channel')  # Use channelName instead of channelId
+    print(channel_name)
     if not channel_name:
         return jsonify({"error": "Channel name is required"}), 400
     
@@ -172,7 +173,7 @@ def send_message():
     content = message.get('content')
     sender = message.get('sender')
     timestamp = message.get('timestamp')
-    channel_name = message.get('channelName')  # Use channelName instead of channelId
+    channel_name = message.get('name')  # Use channelName instead of channelId
 
     if not content:
         return "No content", 400
@@ -216,7 +217,7 @@ def send_message():
 def read_messages():
     global CHANNEL_FILE
     try:
-        with open(CHANNEL_FILE, 'r') as f:
+        with open(CHANNEL_FILE, 'r', encoding='utf-8') as f:
             messages = json.load(f)
     except FileNotFoundError:
         return []
@@ -234,8 +235,12 @@ def read_messages_for_channel(channel_name):
 
 def save_messages(messages):
     global CHANNEL_FILE
-    with open(CHANNEL_FILE, 'w') as f:
-        json.dump(messages, f)
+    try:
+        with open(CHANNEL_FILE, 'w', encoding='utf-8') as f:
+            json.dump(messages, f,ensure_ascii=False)
+        print("Messages successfully saved!")
+    except Exception as e:
+        print(f"Error saving messages: {e}")
 
 # Pin a message
 @app.route('/pin', methods=['POST'])
@@ -262,25 +267,30 @@ from datetime import datetime, timedelta
 def delete_old_messages():
     one_day_ago = datetime.now() - timedelta(days=1)
     messages = read_messages()
-    
+
     filtered_messages = []
     for msg in messages:
         try:
-            # Handle missing timestamp and incorrect format gracefully
             timestamp = msg.get('timestamp')
             if timestamp:
                 # Ensure the timestamp is in the correct format before comparing
-                msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+                try:
+                    msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+                except ValueError:
+                    print(f"Skipping message with invalid timestamp format: {timestamp}")  # Log the bad timestamp
+                    filtered_messages.append(msg)  # Optionally, keep messages with bad timestamps
+                    continue
+
+                # If the message is pinned or within the last day, keep it
                 if msg.get('pinned', False) or msg_time > one_day_ago:
                     filtered_messages.append(msg)
             else:
-                # If no timestamp, keep it or handle differently
+                # Handle missing timestamps if necessary
                 print(f"Skipping message with missing timestamp: {msg}")
-                filtered_messages.append(msg)
-        except ValueError:
-            # Handle incorrect timestamp format gracefully
-            print(f"Skipping message with invalid timestamp: {msg.get('timestamp')}")
-            filtered_messages.append(msg)  # Optionally log or handle differently
+                filtered_messages.append(msg)  # Optionally keep messages with no timestamp
+        except Exception as e:
+            print(f"Error processing message: {e}")  # Catch any other errors and log them
+            filtered_messages.append(msg)  # Keep the message in case of error
     
     save_messages(filtered_messages)
 

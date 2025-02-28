@@ -56,7 +56,7 @@ export default ChannelList;
 const ChannelList = ({ channels, setChannel }) => {
   return (
     <div className="channel-list">
-      <h2>Channels</h2>
+      <h2>Available Channels</h2>
       {channels.length > 0 ? (
         <ul>
           {channels.map((channel) => (

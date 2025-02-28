@@ -1,29 +1,5 @@
 // App.js
-/*
-import React, { useState } from 'react';
-import ChannelList from './ChannelList';
-import ChatWindow from './ChatWindow';
-import UserNamePrompt from './UserNamePrompt';
 
-const App = () => {
-  const [userName, setUserName] = useState('');
-  const [channel, setChannel] = useState(null);
-
-  if (!userName) {
-    return <UserNamePrompt setUserName={setUserName} />;
-  }
-
-  return (
-    <div className="app">
-      <h1>Welcome, {userName}</h1>
-      <ChannelList setChannel={setChannel} />
-      {channel && <ChatWindow channel={channel} userName={userName} />}
-    </div>
-  );
-};
-
-export default App;
-*/
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChannelList from './ChannelList';
