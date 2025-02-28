@@ -163,7 +163,7 @@
                     fetchMessages(channel.endpoint);
                 }
             }, [channel]);
-
+            //statt 'authkey 0987654321' : channel.authkey
             const fetchMessages = (endpoint) => {
                 fetch(endpoint, { headers: { 'Authorization': 'authkey 0987654321' } }) // Use your channel auth key
                     .then(response => response.json())
