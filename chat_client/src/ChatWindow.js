@@ -3,21 +3,32 @@ import axios from 'axios';
 import MessageInput from './MessageInput';
 import './ChatWindow.css';
 
-const API_URL = 'http://localhost:5001';  
+//const API_URL = 'http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi/'; // Uni server
+//const API_URL = channel.endpoint;
 
 const ChatWindow = ({ channel, userName }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [seenUsers, setSeenUsers] = useState({});
+  const API_URL = channel.endpoint;
 
   useEffect(() => {
     const fetchMessages = async () => {
       setLoading(true);
       setError(null);
-      try {
 
-        const response = await axios.get(`${API_URL}/messages?channel=${channel.name}`);
+      // Dynamically construct the API URL based on the selected channel
+      const channelAPIURL = `${API_URL}/messages?channel=${channel.name}`;
+
+      try {
+        
+        //const response = await axios.get(channelAPIURL);
+        const response = await axios.get(channel.endpoint, {
+          headers: {
+            'Authorization': 'authkey ' + channel.authkey, // Add the Authorization header
+          },
+        });
         console.log('Channel name received:', channel.name);
         setMessages(response.data);
       } catch (error) {
@@ -29,8 +40,10 @@ const ChatWindow = ({ channel, userName }) => {
       console.log('Selected channel:', channel);
     };
 
-    fetchMessages();
-  }, [channel]);
+    if (channel) {
+      fetchMessages(); // Fetch messages for the selected channel
+    }
+  }, [channel]); // Depend on the channel to re-fetch messages when the selected channel changes
 
   const formatMessage = (message) => {
     return message
@@ -38,8 +51,10 @@ const ChatWindow = ({ channel, userName }) => {
       .replace(/\[nop\](.*?)\[\/nop\]/g, '<b>$1</b>') 
       .replace(/\_\_([^_]+)\_\_/g, '<u>$1</u>');  
   };
-  
-  const authKey = '0987654321';
+
+  //const authKey = '0987654321';
+  const authKey = channel.authKey;
+
 
   const handleSendMessage = async (message, channelName) => {
     const messagePayload = {
@@ -48,7 +63,7 @@ const ChatWindow = ({ channel, userName }) => {
       content: message,        // Send the actual message content
       timestamp: new Date().toISOString(),  // Timestamp of the message
     };
-    console.log('Sending message payload:', messagePayload); //bug test
+    console.log('Sending message payload:', messagePayload); //debugging
   
     try {
       const response = await axios.post(`${API_URL}/messages`, messagePayload, {
@@ -72,23 +87,6 @@ const ChatWindow = ({ channel, userName }) => {
       console.error('Error sending message:', error);
       setError('Failed to send message');
     }
-   
-
-  };
-
-  const getUserDisplayName = (sender) => {
-    if (sender === userName) {
-      return ''; // Do not display the username if it's the user's message
-    }
-    // If it's the first time we see the user, display full name, else display initials
-    if (!seenUsers[sender]) {
-      // Mark this sender as seen and display their full name
-      setSeenUsers((prevState) => ({ ...prevState, [sender]: true }));
-      return sender; // Display full name the first time
-    } else {
-      // Display only the first initial of the sender if we've seen them before
-      return sender.charAt(0).toUpperCase(); // Initial of the sender
-    }
   };
 
   return (
@@ -104,7 +102,7 @@ const ChatWindow = ({ channel, userName }) => {
             {/* Display sender's name */}
             {msg.sender && (
               <div className={`message-sender ${msg.sender === 'plantbot' ? 'bot-sender' : ''}`}>
-                {getUserDisplayName(msg.sender)}
+                {msg.sender}
               </div>
             )}
             {/* Message Content */}

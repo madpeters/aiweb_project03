@@ -5,8 +5,10 @@ import axios from 'axios';
 import ChannelList from './ChannelList';
 import ChatWindow from './ChatWindow';
 import UserNamePrompt from './UserNamePrompt';
-
-const API_URL = 'http://localhost:5555'; // Hub app URL
+// HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
+//HUB_AUTHKEY = 'Crr-K24d-2N'
+// const API_URL = 'http://localhost:5555'; // Hub app URL
+const API_URL = 'http://vm146.rz.uni-osnabrueck.de/hub';  //unni server hub
 
 const App = () => {
   const [userName, setUserName] = useState('');
@@ -15,8 +17,8 @@ const App = () => {
   
   // Fetch channels from the hub app when the app loads
   useEffect(() => {
-    const authKey = '1234567890'; // Replace with your actual auth key or token
-    
+    // const authKey = '1234567890';
+    const authKey = 'Crr-K24d-2N'; // uni server auth key
     axios.get(`${API_URL}/channels`, {
       headers: {
         'Authorization': `Bearer ${authKey}`  // Adjust as needed
