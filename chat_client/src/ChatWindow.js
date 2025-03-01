@@ -11,7 +11,10 @@ const ChatWindow = ({ channel, userName }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [seenUsers, setSeenUsers] = useState({});
-  const API_URL = channel.endpoint;
+  //const API_URL = channel.endpoint;
+  const API_URL = channel.endpoint.replace(/\/$/, ''); // Remove trailing slash if present
+ 
+  console.log('API URL:', API_URL);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -58,17 +61,17 @@ const ChatWindow = ({ channel, userName }) => {
 
   const handleSendMessage = async (message, channelName) => {
     const messagePayload = {
-      channelName: channelName,  // Pass the channel name here
+      name: channelName,  // Pass the channel name here mp:: changed key to name from channel_name to match the server
       sender: userName,        // Send the sender's name
       content: message,        // Send the actual message content
       timestamp: new Date().toISOString(),  // Timestamp of the message
     };
     console.log('Sending message payload:', messagePayload); //debugging
-  
     try {
       const response = await axios.post(`${API_URL}/messages`, messagePayload, {
         headers: {
-          'Authorization': `authkey ${authKey}`,  // Send the Authorization header
+          //'Authorization': `authkey ${authKey}`,  // Send the Authorization header
+          'Authorization': 'authkey ' + channel.authkey, // Add the Authorization header mp: replaced the above to avoid authkey error
         },
       });
       console.log('Message sent successfully:', response.data);

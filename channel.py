@@ -360,10 +360,6 @@ def generate_houseplant_response(user_message): # Active response function for h
         return f"💡 Houseplant Tip: {random.choice(HOUSEPLANT_TIPS)}" # Random tip from list
     else:
         return "🌿  That's interesting!  Tell me more about your houseplants." # General response
-    
-@app.route('/react_client')
-def react_client():
-    return render_template('react_client.html')
 
 if __name__ == '__main__':
     send_welcome_message()
