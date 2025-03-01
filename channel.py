@@ -20,7 +20,8 @@ class ConfigClass(object):
     SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!'
 
 # Create Flask app
-app = Flask(__name__)
+#app = Flask(__name__)
+app = Flask(__name__, static_folder='chat_client/build', static_url_path='/')
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 # Initialize CORS to allow requests from React app (frontend)
