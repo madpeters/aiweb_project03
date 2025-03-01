@@ -1,12 +1,13 @@
 ## channel.py - a simple message channel
 ##
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_from_directory
 import json
 import requests
 from datetime import datetime, timedelta
 from flask_cors import CORS
 from better_profanity import profanity  #mp added unwanted words
+import os
 
 # mp Initialize the profanity filter
 profanity.load_censor_words()
@@ -20,13 +21,23 @@ class ConfigClass(object):
     SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!'
 
 # Create Flask app
-app = Flask(__name__)
+#app = Flask(__name__)
+app = Flask(__name__, static_folder='chat_client/build', static_url_path='/')
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 # Initialize CORS to allow requests from React app (frontend)
 CORS(app)
 CORS(app, origins="http://localhost:3000")
 
+@app.route('/chat_client/build')
+def static_proxy(path):
+    # Serve the static files from the build directory
+    return send_from_directory(app.static_folder, path)
+
+@app.route('/')
+def index():
+    # Serve the main index.html file
+    return send_from_directory(app.static_folder, 'index.html')
 
 #HUB_URL = 'http://localhost:5555'
 HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
