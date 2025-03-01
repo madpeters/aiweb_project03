@@ -333,7 +333,7 @@ def send_welcome_message():
         'sender': 'Houseplant Bot',
         'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
         'extra': None,
-        'pinned': False,
+        'pinned': True,
         'response' : None # Welcome message has no response
     }
     messages = read_messages()
