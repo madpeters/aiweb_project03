@@ -26,8 +26,11 @@ const ChatWindow = ({ channel, userName }) => {
       const channelAPIURL = `${API_URL}/messages?channel=${channel.name}`;
   
       try {
-        const response = await axios.get(channelAPIURL);
-  
+        const response = await axios.get(channel.endpoint, {
+          headers: {
+            'Authorization': 'authkey ' + channel.authkey, // Add the Authorization header
+          },
+        });
         // Set messages received from the server
         setMessages(response.data);
       } catch (error) {
