@@ -173,11 +173,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-asset-manifest.json
-chat_client/*
-favicon.ico
-index.html
-precache-manifest.*
-robots.txt
-service-worker.js
-static/
+
