@@ -113,7 +113,7 @@ const ChatWindow = ({ channel, userName }) => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-        },
+        },     
         body: JSON.stringify({ pinned: message.pinned }),
       })
         .then((response) => response.json())
