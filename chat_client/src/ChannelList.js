@@ -2,76 +2,39 @@
 
 // ChannelList.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-/*
-const ChannelList = ({ setChannel }) => {
-  const [channels, setChannels] = useState([]);
-  const [unreadMessages, setUnreadMessages] = useState({});
+ 
+import './ChannelList.css';  
 
-  useEffect(() => {
-    // Fetch the channels and keep updating the unread messages count
-    const fetchChannels = async () => {
-      try {
-        const response = await axios.get('/api/channels'); // Example endpoint
-        setChannels(response.data);
-      } catch (error) {
-        console.error('Error fetching channels:', error);
-      }
-    };
 
-    fetchChannels();
-
-    // Simulate updating the unread messages count in the background
-    const interval = setInterval(() => {
-      setUnreadMessages((prev) => {
-        const newUnread = { ...prev };
-        channels.forEach((channel) => {
-          newUnread[channel.id] = (newUnread[channel.id] || 0) + Math.floor(Math.random() * 3);
-        });
-        return newUnread;
-      });
-    }, 5000); // Update every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [channels]);
-
-  return (
-    <div className="channel-list">
-      {channels.map((channel) => (
-        <div key={channel.id} className="channel-item" onClick={() => setChannel(channel)}>
-          <span>{channel.name}</span>
-          {unreadMessages[channel.id] && (
-            <span className="unread-count">{unreadMessages[channel.id]} unread</span>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default ChannelList;
-*/
 
 
 const ChannelList = ({ channels, setChannel }) => {
   return (
     <div className="channel-list">
-      <h2>Available Channels</h2>
+      <h2 className="channel-list-title">Available Channels</h2>
       {channels.length > 0 ? (
-        <ul>
+        <ul className="channel-list-items">
           {channels.map((channel) => (
-            <li key={channel.id} onClick={() => {console.log('Channel selected:', channel); setChannel(channel)}}>
+            <li
+              key={channel.id}
+              className="channel-item"
+              onClick={() => {
+                console.log('Channel selected:', channel);
+                setChannel(channel);
+              }}
+            >
               
-              {channel.name}
+              <span className="channel-name">{channel.name}</span>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No channels available.</p>
+        <p className="no-channels-text">No channels available.</p>
       )}
     </div>
   );
 };
 
 export default ChannelList;
+
 

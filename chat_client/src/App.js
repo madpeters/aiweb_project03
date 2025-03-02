@@ -1,14 +1,11 @@
-// App.js
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ChannelList from './ChannelList';
 import ChatWindow from './ChatWindow';
 import UserNamePrompt from './UserNamePrompt';
-// HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-//HUB_AUTHKEY = 'Crr-K24d-2N'
+import './App.css';
 // const API_URL = 'http://localhost:5555'; // Hub app URL
-const API_URL = 'http://vm146.rz.uni-osnabrueck.de/hub';  //unni server hub
+const API_URL = 'http://vm146.rz.uni-osnabrueck.de/hub';  //uni server hub
 
 const App = () => {
   const [userName, setUserName] = useState('');
@@ -17,7 +14,7 @@ const App = () => {
   
   // Fetch channels from the hub app when the app loads
   useEffect(() => {
-    // const authKey = '1234567890';
+   // const authKey = '1234567890';
     const authKey = 'Crr-K24d-2N'; // uni server auth key
     axios.get(`${API_URL}/channels`, {
       headers: {
@@ -40,8 +37,10 @@ const App = () => {
   return (
     <div className="app">
       <h1>Welcome, {userName}</h1>
-      <ChannelList channels={channels} setChannel={setChannel} />
-      {channel && <ChatWindow channel={channel} userName={userName} />}
+      <div className="channel-chat-container">
+        <ChannelList channels={channels} setChannel={setChannel} />
+        {channel && <ChatWindow channel={channel} userName={userName} />}
+      </div>
     </div>
   );
 };

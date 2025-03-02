@@ -1,0 +1,45 @@
+/* General Channel List Styling */
+.channel-list {
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .channel-list-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .channel-list-items {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  
+  .channel-item {
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .channel-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .channel-item span {
+    font-size: 1.1rem;
+    color: #007bff;
+  }
+  
+  .no-channels-text {
+    text-align: center;
+    color: #888;
+  }
+  
+  
