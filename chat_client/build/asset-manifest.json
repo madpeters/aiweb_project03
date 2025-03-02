@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/u096/aiweb_project03/chat_client/static/css/main.1ecf4ad8.chunk.css",
-    "main.js": "/u096/aiweb_project03/chat_client/static/js/main.27c569df.chunk.js",
-    "main.js.map": "/u096/aiweb_project03/chat_client/static/js/main.27c569df.chunk.js.map",
-    "runtime~main.js": "/u096/aiweb_project03/chat_client/static/js/runtime~main.73f03843.js",
-    "runtime~main.js.map": "/u096/aiweb_project03/chat_client/static/js/runtime~main.73f03843.js.map",
-    "static/js/2.ea124d61.chunk.js": "/u096/aiweb_project03/chat_client/static/js/2.ea124d61.chunk.js",
-    "static/js/2.ea124d61.chunk.js.map": "/u096/aiweb_project03/chat_client/static/js/2.ea124d61.chunk.js.map",
-    "static/js/3.3a41f75c.chunk.js": "/u096/aiweb_project03/chat_client/static/js/3.3a41f75c.chunk.js",
-    "static/js/3.3a41f75c.chunk.js.map": "/u096/aiweb_project03/chat_client/static/js/3.3a41f75c.chunk.js.map",
-    "index.html": "/u096/aiweb_project03/chat_client/index.html",
-    "precache-manifest.37f36464648c399712447aedfdf47915.js": "/u096/aiweb_project03/chat_client/precache-manifest.37f36464648c399712447aedfdf47915.js",
-    "service-worker.js": "/u096/aiweb_project03/chat_client/service-worker.js",
-    "static/css/main.1ecf4ad8.chunk.css.map": "/u096/aiweb_project03/chat_client/static/css/main.1ecf4ad8.chunk.css.map"
+    "main.css": "/u096/aiweb_project03/chat_client/build/static/css/main.1ecf4ad8.chunk.css",
+    "main.js": "/u096/aiweb_project03/chat_client/build/static/js/main.27c569df.chunk.js",
+    "main.js.map": "/u096/aiweb_project03/chat_client/build/static/js/main.27c569df.chunk.js.map",
+    "runtime~main.js": "/u096/aiweb_project03/chat_client/build/static/js/runtime~main.1f0409de.js",
+    "runtime~main.js.map": "/u096/aiweb_project03/chat_client/build/static/js/runtime~main.1f0409de.js.map",
+    "static/js/2.ea124d61.chunk.js": "/u096/aiweb_project03/chat_client/build/static/js/2.ea124d61.chunk.js",
+    "static/js/2.ea124d61.chunk.js.map": "/u096/aiweb_project03/chat_client/build/static/js/2.ea124d61.chunk.js.map",
+    "static/js/3.3a41f75c.chunk.js": "/u096/aiweb_project03/chat_client/build/static/js/3.3a41f75c.chunk.js",
+    "static/js/3.3a41f75c.chunk.js.map": "/u096/aiweb_project03/chat_client/build/static/js/3.3a41f75c.chunk.js.map",
+    "index.html": "/u096/aiweb_project03/chat_client/build/index.html",
+    "precache-manifest.a77e98f3827284345bf8249cd7f78e9b.js": "/u096/aiweb_project03/chat_client/build/precache-manifest.a77e98f3827284345bf8249cd7f78e9b.js",
+    "service-worker.js": "/u096/aiweb_project03/chat_client/build/service-worker.js",
+    "static/css/main.1ecf4ad8.chunk.css.map": "/u096/aiweb_project03/chat_client/build/static/css/main.1ecf4ad8.chunk.css.map"
   }
 }
