@@ -253,24 +253,26 @@ def save_messages(messages):
     except Exception as e:
         print(f"Error saving messages: {e}")
 
-# Pin a message
-@app.route('/pin', methods=['POST'])
-def pin_message():
-    message_data = request.json
-    timestamp = message_data.get('timestamp', '')
-    
-    if not timestamp:
-        return "No timestamp provided", 400
 
+
+
+@app.route('/update_message/<int:message_id>', methods=['PATCH'])
+def update_message(message_id):
+    # Find the message in the database (or list in this case)
     messages = read_messages()
+    message = next((msg for msg in messages if msg['id'] == message_id), None)
+
+    if not message:
+        return jsonify({"error": "Message not found"}), 404
     
-    for message in messages:
-        if message['timestamp'] == timestamp:
-            message['pinned'] = True
-            save_messages(messages)
-            return jsonify({"message": "Message pinned successfully!"}), 200
+    # Get the new pinned value from the request body (assuming JSON body)
+    pinned = request.json.get('pinned', message['pinned'])
     
-    return "Message not found", 404
+    # Update the pinned state
+    message['pinned'] = pinned
+    
+    return jsonify(message)
+
 
 # Delete messages older than 1 day (except pinned ones)
 from datetime import datetime, timedelta
@@ -322,6 +324,7 @@ def search_messages():
     matching_messages = [msg for msg in messages if query in msg['content'].lower()]
     return jsonify(matching_messages)
 
+
 # Start development web server
 # run flask --app channel.py register
 # to register channel with hub
@@ -344,7 +347,7 @@ def send_welcome_message():
         'sender': 'Houseplant Bot',
         'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
         'extra': None,
-        'pinned': False,
+        'pinned': True,
         'response' : None # Welcome message has no response
     }
     messages = read_messages()
