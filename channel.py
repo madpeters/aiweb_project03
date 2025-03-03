@@ -378,10 +378,7 @@ def send_welcome_message():
     }
     messages = read_messages()
 
-    # Check if the welcome message already exists
-    if not messages or messages[0]['content'] != welcome_message['content']:
-        messages.insert(0, welcome_message)  # Insert the welcome message at the beginning
-        save_messages(messages)
+   
 
 def generate_houseplant_response(user_message): # Active response function for houseplants # Added - Active response function
     """Generates a simple houseplant tip or response based on user message content.""" # Added - Docstring
