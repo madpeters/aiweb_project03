@@ -377,4 +377,4 @@ def generate_houseplant_response(user_message): # Active response function for h
 
 if __name__ == '__main__':
     send_welcome_message()
-    app.run(port=5001, debug=True)
+    app.run()
