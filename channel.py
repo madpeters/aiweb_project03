@@ -133,16 +133,35 @@ def home_page():
     if not check_authorization(request):
         return "Invalid authorization2 ", 400
     return jsonify(read_messages())
-
 @app.route('/messages', methods=['GET'])
 def get_messages():
     channel_name = request.args.get('channel')  # Use channelName instead of channelId
-    print(channel_name)
+    print(f"Channel Name: {channel_name}")
+    
     if not channel_name:
         return jsonify({"error": "Channel name is required"}), 400
     
     # Fetch messages for the specified channel
     messages = read_messages_for_channel(channel_name)
+    
+    # Check if the welcome message is already in the list
+    welcome_message_exists = any(msg['sender'] == 'Houseplant Bot' for msg in messages)
+    
+    # If welcome message doesn't exist, add it
+    if not welcome_message_exists:
+        welcome_message = {
+            'content': WELCOME_MESSAGE_CONTENT,
+            'sender': 'Houseplant Bot',
+            'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            'extra': None,
+            'pinned': True,
+            'response': None
+        }
+        messages.insert(0, welcome_message)  # Insert it at the top of the message list
+        
+        # Optionally save the updated messages if needed
+        save_messages_for_channel(channel_name, messages)
+
     return jsonify(messages)
 
 
@@ -404,4 +423,4 @@ def generate_houseplant_response(user_message): # Active response function for h
 
 if __name__ == '__main__':
     send_welcome_message()
-    app.run()
+    app.run(debug=True)
