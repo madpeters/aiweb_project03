@@ -161,7 +161,7 @@ def get_messages():
         messages.insert(0, welcome_message)  # Insert it at the top of the message list
         
         # Optionally save the updated messages if needed
-        save_messages(messages)
+        send_message(welcome_message)
 
     return jsonify(messages)
 
