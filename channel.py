@@ -324,7 +324,7 @@ def delete_old_messages():
 
         try:
             timestamp = datetime.fromisoformat(msg['timestamp'])
-            if msg.get('pinned', False) or timestamp > one_day_ago:
+            if msg.get('pinned', True) or timestamp > one_day_ago:
                 filtered_messages.append(msg)
         except (KeyError, ValueError):
             # Handle cases where timestamp is missing or invalid
