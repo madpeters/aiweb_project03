@@ -44,7 +44,7 @@ HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
 HUB_AUTHKEY = 'Crr-K24d-2N'
 #HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
-CHANNEL_NAME = "Talking Houseplants 2 🌱" # mp name of the channel changed
+CHANNEL_NAME = "Talking Houseplants 🌱" # mp name of the channel changed
 #CHANNEL_ENDPOINT = "http://localhost:5000" # don't forget to adjust in the bottom of the file
 CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u096/public_html/aiweb_project03/channel.wsgi/"
 CHANNEL_FILE = 'messages.json'
@@ -102,10 +102,10 @@ def check_authorization(request):
 @app.route('/health', methods=['GET'])
 def health_check():
     global CHANNEL_NAME
+    print("Received Health Check Request:", request.headers)  # Debug the headers here
     if not check_authorization(request):
-        return "Invalid authorization 1", 400
-    return jsonify({'name':CHANNEL_NAME}),  200
-
+        return "Invalid authorization", 400
+    return jsonify({'name': CHANNEL_NAME}),  200
 
 
 
