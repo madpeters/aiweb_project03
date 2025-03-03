@@ -378,7 +378,10 @@ def send_welcome_message():
         'response' : None # Welcome message has no response
     }
     messages = read_messages()
-
+    messages.append(welcome_message)
+    
+    # Save the updated list of messages, including the welcome message
+    save_messages(messages)
    
 
 def generate_houseplant_response(user_message): # Active response function for houseplants # Added - Active response function
