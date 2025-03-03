@@ -22,14 +22,22 @@ class ConfigClass(object):
 
 # Create Flask app
 app = Flask(__name__)
-
-
+#app = Flask(__name__, static_folder='chat_client/static', static_url_path='/')
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 # Initialize CORS to allow requests from React app (frontend)
 CORS(app)
 #CORS(app, origins="http://localhost:3000")
 
+#@app.route('/chat_client/build')
+#def static_proxy(path):
+    # Serve the static files from the build directory
+#    return send_from_directory(app.static_folder, path)
+
+#@app.route('/')
+#def index():
+    # Serve the main index.html file
+#    return send_from_directory(app.static_folder, 'index.html')
 
 #HUB_URL = 'http://localhost:5555'
 HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
@@ -125,41 +133,57 @@ def home_page():
     if not check_authorization(request):
         return "Invalid authorization2 ", 400
     return jsonify(read_messages())
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     channel_name = request.args.get('channel')  # Use channelName instead of channelId
-    print(f"Channel Name: {channel_name}")
-    
+    print(channel_name)
     if not channel_name:
         return jsonify({"error": "Channel name is required"}), 400
     
     # Fetch messages for the specified channel
     messages = read_messages_for_channel(channel_name)
-    
-    # Check if the welcome message is already in the list
-    welcome_message_exists = any(msg['sender'] == 'Houseplant Bot' for msg in messages)
-    
-    # If welcome message doesn't exist, add it
-    if not welcome_message_exists:
-        welcome_message = {
-            'content': WELCOME_MESSAGE_CONTENT,
-            'sender': 'Houseplant Bot',
-            'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
-            'extra': None,
-            'pinned': True,
-            'response': None
-        }
-        print("Adding welcome message to the list of messages")
-        messages.insert(0, welcome_message)  # Insert it at the top of the message list
-        
-        # Optionally save the updated messages if needed
-        send_message(welcome_message)
-
     return jsonify(messages)
 
 
 
-
+# POST: Send a message
+#@app.route('/', methods=['POST'])
+#def send_message():
+    # fetch channels from server
+    # check authorization header
+#    if not check_authorization(request):
+#        return "Invalid authorization", 400
+    # check if message is present
+#    message = request.json
+#    if not message:
+#        return "No message", 400
+#    content = message.get('content', '')
+#    if not 'content' in message:
+#        return "No content", 400
+#    if not 'sender' in message:
+#        return "No sender", 400
+#    if not 'timestamp' in message:
+#        return "No timestamp", 400
+    # Check for unwanted words
+#    if not filter_message(content):
+#        return "Message contains inappropriate content", 400
+#    if not 'extra' in message:
+#        extra = None
+#    else:
+#        extra = message['extra']
+#    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))
+    # add message to messages
+#    messages = read_messages()
+#    messages.append({'content': message['content'],
+#                     'sender': message['sender'],
+#                     'timestamp': timestamp,
+#                     'extra': extra,
+#                        'pinned': False,
+#                     })
+#    delete_old_messages()
+#    save_messages(messages)
+#    return "OK", 200
 
 # POST: Send a message
 @app.route('/messages', methods=['POST'])
@@ -228,26 +252,6 @@ def read_messages():
     except json.decoder.JSONDecodeError:
         messages = []
     f.close()
-
-
-    # Check if the welcome message is already in the list
-    welcome_message_exists = any(msg['sender'] == 'Houseplant Bot' for msg in messages)
-    
-    # If welcome message doesn't exist, add it
-    if not welcome_message_exists:
-        welcome_message = {
-            'content': WELCOME_MESSAGE_CONTENT,
-            'sender': 'Houseplant Bot',
-            'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
-            'extra': None,
-            'pinned': True,
-            'response': None
-        }
-        print("Adding welcome message to the list of messages")
-        messages.insert(0, welcome_message)  # Insert it at the top of the message list
-        
-        # Optionally save the updated messages if needed
-        send_message(welcome_message)
     return messages
 
 # Function to read messages for a specific channel
@@ -296,12 +300,31 @@ def delete_old_messages():
 
     filtered_messages = []
     for msg in messages:
-    
+    #   try:
+    #        timestamp = msg.get('timestamp')
+    #        if timestamp:
+    #            # Ensure the timestamp is in the correct format before comparing
+    #            try:
+    #                msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+    #            except ValueError:
+    #                print(f"Skipping message with invalid timestamp format: {timestamp}")  # Log the bad timestamp
+    #                filtered_messages.append(msg)  # Optionally, keep messages with bad timestamps
+    #                continue
+
+                # If the message is pinned or within the last day, keep it
+    #            if msg.get('pinned', False) or msg_time > one_day_ago:
+    #                filtered_messages.append(msg)
+    #        else:
+                # Handle missing timestamps if necessary
+    #            print(f"Skipping message with missing timestamp: {msg}")
+    #            filtered_messages.append(msg)  # Optionally keep messages with no timestamp
+    #    except Exception as e:
+    #        print(f"Error processing message: {e}")  # Catch any other errors and log them
+    #        filtered_messages.append(msg)  # Keep the message in case of error
 
         try:
             timestamp = datetime.fromisoformat(msg['timestamp'])
-            pinned=msg['pinned']
-            if pinned==False or timestamp > one_day_ago:
+            if msg.get('pinned', False) or timestamp > one_day_ago:
                 filtered_messages.append(msg)
         except (KeyError, ValueError):
             # Handle cases where timestamp is missing or invalid
@@ -354,10 +377,7 @@ def send_welcome_message():
         'response' : None # Welcome message has no response
     }
     messages = read_messages()
-    messages.append(welcome_message)
-    
-    # Save the updated list of messages, including the welcome message
-    save_messages(messages)
+
    
 
 def generate_houseplant_response(user_message): # Active response function for houseplants # Added - Active response function
@@ -380,4 +400,4 @@ def generate_houseplant_response(user_message): # Active response function for h
 
 if __name__ == '__main__':
     send_welcome_message()
-    app.run(debug=True)
+    app.run()
