@@ -4,7 +4,7 @@ import MessageInput from './MessageInput';
 import { FaThumbtack } from 'react-icons/fa'; // Import pin icon from react-icons
 import './ChatWindow.css';
 
-//const API_URL = 'http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi/'; // Uni server
+const API_URL = 'http://vm146.rz.uni-osnabrueck.de/u064/project3/aiweb_project03/channel.wsgi/'; // Uni server
 //const API_URL = channel.endpoint;
 
 const ChatWindow = ({ channel, userName }) => {
@@ -13,7 +13,7 @@ const ChatWindow = ({ channel, userName }) => {
   const [error, setError] = useState(null);
   const [seenUsers, setSeenUsers] = useState({});
   //const API_URL = channel.endpoint;
-  const API_URL = channel.endpoint.replace(/\/$/, ''); // Remove trailing slash if present
+  //const API_URL = channel.endpoint.replace(/\/$/, ''); // Remove trailing slash if present
 
   console.log('API URL:', API_URL);
 

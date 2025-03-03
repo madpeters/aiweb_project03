@@ -39,14 +39,14 @@ CORS(app, origins="http://localhost:3000")
     # Serve the main index.html file
 #    return send_from_directory(app.static_folder, 'index.html')
 
-# HUB_URL = 'http://localhost:5555'
-HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-HUB_AUTHKEY = 'Crr-K24d-2N'
-# HUB_AUTHKEY = '1234567890'
+HUB_URL = 'http://localhost:5555'
+#HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
+#HUB_AUTHKEY = 'Crr-K24d-2N'
+HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
 CHANNEL_NAME = "Talking Houseplants 🌱" # mp name of the channel changed
-#CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
-CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u064/public_html/project3/aiweb_project03/channel.wsgi/"
+#CHANNEL_ENDPOINT = "http://localhost:5000" # don't forget to adjust in the bottom of the file
+CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/u096/public_html/aiweb_project03/channel.wsgi/"
 CHANNEL_FILE = 'messages.json'
 CHANNEL_TYPE_OF_SERVICE = 'aiweb24:houseplant_chat'
 
@@ -365,15 +365,15 @@ def generate_houseplant_response(user_message): # Active response function for h
         return "💧 Remember to check the soil moisture before watering your houseplants. Most prefer the top inch of soil to dry out between waterings."
     elif "sunlight" in user_message_lower or "light" in user_message_lower:
         return "☀️  Houseplants thrive in bright, indirect sunlight. Consider the light requirements of your specific plant."
-    elif "fertilize" in user_message_lower or "fertiliser" in user_message_lower or "feed":
+    elif "fertilize" in user_message_lower or "fertiliser" in user_message_lower or "feed" in user_message_lower:
         return "🌱 During the growing season (spring/summer), fertilizing every 2-4 weeks can boost your houseplant's health."
     elif "pest" in user_message_lower or "bugs" in user_message_lower or "disease" in user_message_lower:
         return "🔎 Regularly inspect your houseplants for pests and diseases. Early detection is key to treatment!"
-    elif "tip" in user_message_lower or "advice" in user_message_lower or "help":
+    elif "tip" in user_message_lower or "advice" in user_message_lower or "help" in user_message_lower:
         import random
         return f"💡 Houseplant Tip: {random.choice(HOUSEPLANT_TIPS)}" # Random tip from list
     else:
-        return "🌿  That's interesting!  Tell me more about your houseplants." # General response
+        return "🌿  That's interesting!  Tell me more about your houseplants." # General response// if we don't want a message esle return None or ""
 
 if __name__ == '__main__':
     send_welcome_message()
