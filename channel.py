@@ -157,6 +157,7 @@ def get_messages():
             'pinned': True,
             'response': None
         }
+        print("Adding welcome message to the list of messages")
         messages.insert(0, welcome_message)  # Insert it at the top of the message list
         
         # Optionally save the updated messages if needed
