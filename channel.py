@@ -160,7 +160,7 @@ def get_messages():
         messages.insert(0, welcome_message)  # Insert it at the top of the message list
         
         # Optionally save the updated messages if needed
-        save_messages_for_channel(channel_name, messages)
+        save_messages(messages)
 
     return jsonify(messages)
 
