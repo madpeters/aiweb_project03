@@ -22,22 +22,14 @@ class ConfigClass(object):
 
 # Create Flask app
 app = Flask(__name__)
-#app = Flask(__name__, static_folder='chat_client/static', static_url_path='/')
+
+
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 # Initialize CORS to allow requests from React app (frontend)
 CORS(app)
 #CORS(app, origins="http://localhost:3000")
 
-#@app.route('/chat_client/build')
-#def static_proxy(path):
-    # Serve the static files from the build directory
-#    return send_from_directory(app.static_folder, path)
-
-#@app.route('/')
-#def index():
-    # Serve the main index.html file
-#    return send_from_directory(app.static_folder, 'index.html')
 
 #HUB_URL = 'http://localhost:5555'
 HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
@@ -167,43 +159,7 @@ def get_messages():
 
 
 
-# POST: Send a message
-#@app.route('/', methods=['POST'])
-#def send_message():
-    # fetch channels from server
-    # check authorization header
-#    if not check_authorization(request):
-#        return "Invalid authorization", 400
-    # check if message is present
-#    message = request.json
-#    if not message:
-#        return "No message", 400
-#    content = message.get('content', '')
-#    if not 'content' in message:
-#        return "No content", 400
-#    if not 'sender' in message:
-#        return "No sender", 400
-#    if not 'timestamp' in message:
-#        return "No timestamp", 400
-    # Check for unwanted words
-#    if not filter_message(content):
-#        return "Message contains inappropriate content", 400
-#    if not 'extra' in message:
-#        extra = None
-#    else:
-#        extra = message['extra']
-#    timestamp = message.get('timestamp', datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))
-    # add message to messages
-#    messages = read_messages()
-#    messages.append({'content': message['content'],
-#                     'sender': message['sender'],
-#                     'timestamp': timestamp,
-#                     'extra': extra,
-#                        'pinned': False,
-#                     })
-#    delete_old_messages()
-#    save_messages(messages)
-#    return "OK", 200
+
 
 # POST: Send a message
 @app.route('/messages', methods=['POST'])
@@ -340,27 +296,7 @@ def delete_old_messages():
 
     filtered_messages = []
     for msg in messages:
-    #   try:
-    #        timestamp = msg.get('timestamp')
-    #        if timestamp:
-    #            # Ensure the timestamp is in the correct format before comparing
-    #            try:
-    #                msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-    #            except ValueError:
-    #                print(f"Skipping message with invalid timestamp format: {timestamp}")  # Log the bad timestamp
-    #                filtered_messages.append(msg)  # Optionally, keep messages with bad timestamps
-    #                continue
-
-                # If the message is pinned or within the last day, keep it
-    #            if msg.get('pinned', False) or msg_time > one_day_ago:
-    #                filtered_messages.append(msg)
-    #        else:
-                # Handle missing timestamps if necessary
-    #            print(f"Skipping message with missing timestamp: {msg}")
-    #            filtered_messages.append(msg)  # Optionally keep messages with no timestamp
-    #    except Exception as e:
-    #        print(f"Error processing message: {e}")  # Catch any other errors and log them
-    #        filtered_messages.append(msg)  # Keep the message in case of error
+    
 
         try:
             timestamp = datetime.fromisoformat(msg['timestamp'])
