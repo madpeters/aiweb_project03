@@ -127,7 +127,12 @@ def health_check():
 
 
 
-
+# GET: Return list of messages
+@app.route('/', methods=['GET'])
+def home_page():
+    if not check_authorization(request):
+        return "Invalid authorization2 ", 400
+    return jsonify(read_messages())
 
 @app.route('/messages', methods=['GET'])
 def get_messages():
