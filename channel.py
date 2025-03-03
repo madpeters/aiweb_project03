@@ -53,24 +53,41 @@ CHANNEL_TYPE_OF_SERVICE = 'aiweb24:houseplant_chat'
 
 MAX_MESSAGES = 100  # Limit the number of messages stored
 #UNWANTED_WORDS = ['badword1', 'badword2']  # List of offensive mp: not used anymore since we use profanity package
+import requests
 
 @app.cli.command('register')
 def register_command():
     global CHANNEL_AUTHKEY, CHANNEL_NAME, CHANNEL_ENDPOINT
 
-    # send a POST request to server /channels
-    response = requests.post(HUB_URL + '/channels', headers={'Authorization': 'authkey ' + HUB_AUTHKEY},
-                             data=json.dumps({
-                                "name": CHANNEL_NAME,
-                                "endpoint": CHANNEL_ENDPOINT,
-                                "authkey": CHANNEL_AUTHKEY,
-                                "type_of_service": CHANNEL_TYPE_OF_SERVICE,
-                             }))
+    # Send a POST request to server /channels
+    response = requests.post(
+        HUB_URL + '/channels', 
+        headers={'Authorization': 'authkey ' + HUB_AUTHKEY},
+        data=json.dumps({
+            "name": CHANNEL_NAME,
+            "endpoint": CHANNEL_ENDPOINT,
+            "authkey": CHANNEL_AUTHKEY,
+            "type_of_service": CHANNEL_TYPE_OF_SERVICE,
+        })
+    )
 
     if response.status_code != 200:
-        print("Error creating channel: "+str(response.status_code))
+        print("Error creating channel: " + str(response.status_code))
         print(response.text)
         return
+    
+    # Check the health after registering the channel
+    health_response = requests.get(
+        HUB_URL + '/health', 
+        headers={'Authorization': 'authkey ' + HUB_AUTHKEY}
+    )
+
+    if health_response.status_code == 200:
+        print("Channel registered successfully and healthy!")
+    else:
+        print("Error: Channel health check failed!")
+        print(health_response.text)
+
 
 def check_authorization(request):
     global CHANNEL_AUTHKEY
