@@ -27,7 +27,7 @@ app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 # Initialize CORS to allow requests from React app (frontend)
 CORS(app)
-CORS(app, origins="http://localhost:3000")
+#CORS(app, origins="http://localhost:3000")
 
 #@app.route('/chat_client/build')
 #def static_proxy(path):
@@ -39,10 +39,10 @@ CORS(app, origins="http://localhost:3000")
     # Serve the main index.html file
 #    return send_from_directory(app.static_folder, 'index.html')
 
-HUB_URL = 'http://localhost:5555'
-#HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-#HUB_AUTHKEY = 'Crr-K24d-2N'
-HUB_AUTHKEY = '1234567890'
+#HUB_URL = 'http://localhost:5555'
+HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
+HUB_AUTHKEY = 'Crr-K24d-2N'
+#HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
 CHANNEL_NAME = "Talking Houseplants 🌱" # mp name of the channel changed
 #CHANNEL_ENDPOINT = "http://localhost:5000" # don't forget to adjust in the bottom of the file
@@ -248,7 +248,7 @@ def save_messages(messages):
     global CHANNEL_FILE
     try:
         with open(CHANNEL_FILE, 'w', encoding='utf-8') as f:
-            json.dump(messages, f,ensure_ascii=False)
+            json.dump(messages, f,ensure_ascii=False, indent=4)
         print("Messages successfully saved!")
     except Exception as e:
         print(f"Error saving messages: {e}")
@@ -283,28 +283,37 @@ def delete_old_messages():
 
     filtered_messages = []
     for msg in messages:
-        try:
-            timestamp = msg.get('timestamp')
-            if timestamp:
-                # Ensure the timestamp is in the correct format before comparing
-                try:
-                    msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-                except ValueError:
-                    print(f"Skipping message with invalid timestamp format: {timestamp}")  # Log the bad timestamp
-                    filtered_messages.append(msg)  # Optionally, keep messages with bad timestamps
-                    continue
+    #   try:
+    #        timestamp = msg.get('timestamp')
+    #        if timestamp:
+    #            # Ensure the timestamp is in the correct format before comparing
+    #            try:
+    #                msg_time = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+    #            except ValueError:
+    #                print(f"Skipping message with invalid timestamp format: {timestamp}")  # Log the bad timestamp
+    #                filtered_messages.append(msg)  # Optionally, keep messages with bad timestamps
+    #                continue
 
                 # If the message is pinned or within the last day, keep it
-                if msg.get('pinned', False) or msg_time > one_day_ago:
-                    filtered_messages.append(msg)
-            else:
+    #            if msg.get('pinned', False) or msg_time > one_day_ago:
+    #                filtered_messages.append(msg)
+    #        else:
                 # Handle missing timestamps if necessary
-                print(f"Skipping message with missing timestamp: {msg}")
-                filtered_messages.append(msg)  # Optionally keep messages with no timestamp
-        except Exception as e:
-            print(f"Error processing message: {e}")  # Catch any other errors and log them
-            filtered_messages.append(msg)  # Keep the message in case of error
-    
+    #            print(f"Skipping message with missing timestamp: {msg}")
+    #            filtered_messages.append(msg)  # Optionally keep messages with no timestamp
+    #    except Exception as e:
+    #        print(f"Error processing message: {e}")  # Catch any other errors and log them
+    #        filtered_messages.append(msg)  # Keep the message in case of error
+
+        try:
+            timestamp = datetime.fromisoformat(msg['timestamp'])
+            if msg.get('pinned', False) or timestamp > one_day_ago:
+                filtered_messages.append(msg)
+        except (KeyError, ValueError):
+            # Handle cases where timestamp is missing or invalid
+            filtered_messages.append(msg)  # Keep the message to prevent data loss
+            print(f"Warning: Invalid timestamp or missing pinned status in message: {msg}")
+
     save_messages(filtered_messages)
 
 def filter_message(content):
@@ -373,8 +382,8 @@ def generate_houseplant_response(user_message): # Active response function for h
         import random
         return f"💡 Houseplant Tip: {random.choice(HOUSEPLANT_TIPS)}" # Random tip from list
     else:
-        return "🌿  That's interesting!  Tell me more about your houseplants." # General response// if we don't want a message esle return None or ""
+        return "🌿  That's interesting!  Tell me more about your houseplants." # General response, if no response, set to "none"
 
 if __name__ == '__main__':
     send_welcome_message()
-    app.run(port=5001, debug=True)
+    app.run()
