@@ -272,6 +272,26 @@ def read_messages():
     except json.decoder.JSONDecodeError:
         messages = []
     f.close()
+
+
+    # Check if the welcome message is already in the list
+    welcome_message_exists = any(msg['sender'] == 'Houseplant Bot' for msg in messages)
+    
+    # If welcome message doesn't exist, add it
+    if not welcome_message_exists:
+        welcome_message = {
+            'content': WELCOME_MESSAGE_CONTENT,
+            'sender': 'Houseplant Bot',
+            'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            'extra': None,
+            'pinned': True,
+            'response': None
+        }
+        print("Adding welcome message to the list of messages")
+        messages.insert(0, welcome_message)  # Insert it at the top of the message list
+        
+        # Optionally save the updated messages if needed
+        send_message(welcome_message)
     return messages
 
 # Function to read messages for a specific channel
